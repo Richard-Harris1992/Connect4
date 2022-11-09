@@ -1,5 +1,6 @@
 
 
+//maybe see how I can break these methods into smaller methods.
 
 
 class Player {
@@ -21,6 +22,7 @@ class Coin {
     constructor(id, htmlElement) {
         this.id = id;
         this.htmlElement = htmlElement;
+
     }
 }
 
@@ -41,16 +43,15 @@ class ConnectFour {
         for(let row = 0; row < this.rows; row++) {
             let rows = [];
             for(let col = 0; col < this.columns; col++) {
-                //JS
-                rows.push(' ');
+               
             
             //HTML
          
             let coin = document.createElement('div');
-            coin.id = `${row.toString()}-${col.toString()}`; 
+            coin.id = `${row}-${col}`;
             coin.classList.add('coin');
             let tileObj = new Coin(coin.id,coin);       //If this works add content prop and set to " " and change when clicked.
-            //tile.addEventListener('click', this.setPiece());
+        
         
             document.getElementById('board').appendChild(coin);
             rows.push(tileObj);
@@ -61,8 +62,10 @@ class ConnectFour {
       
        
         this.addColorChangeClickEvent();
-        return;
+        
     }
+
+   
 
     addColorChangeClickEvent() { //Oh god this was so hard HAHA
         
@@ -71,8 +74,7 @@ class ConnectFour {
             for(let obj = 0; obj < this.gameBoard[i].length; obj++) {
                
                 let objs = this.gameBoard[i][obj];
-                
-                if(typeof objs == 'object') {
+                   
                     let htmlNode = document.getElementById(objs.id);
                     htmlNode.addEventListener('click', (e) => {
                         if(this.gameOver) {
@@ -91,12 +93,12 @@ class ConnectFour {
                         }
                         
                         this.gameBoard[row][col] = this.currentPlayer.color;
-                        let tile = document.getElementById(`${row.toString()}-${col.toString()}`);
+                        let coin = document.getElementById(`${row}-${col}`);
                         if(this.currentPlayer == this.player1) {
-                            tile.classList.add(this.player1.color);
+                            coin.classList.add(this.player1.color);
                             this.currentPlayer = this.player2;
                         } else {
-                            tile.classList.add(this.player2.color);
+                            coin.classList.add(this.player2.color);
                             this.currentPlayer = this.player1;
                         }
                     
@@ -105,12 +107,8 @@ class ConnectFour {
 
                         this.checkWinner();
                     }); //end eventListener function
-                }
             }
-         }
-         
-
-       
+         } 
     }
 
     checkWinner() {
@@ -177,6 +175,6 @@ class ConnectFour {
 
 
 window.onload = function() {
-    new ConnectFour();
+   new ConnectFour();
 }
 
