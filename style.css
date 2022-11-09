@@ -1,0 +1,38 @@
+*{
+    margin: 0px;
+    padding: 0px
+}
+body {
+    text-align: center;
+}
+
+#board {
+    height: 540px;
+    width: 630px;
+    
+    background-color: blue;
+    border: 10px solid navy;
+    
+    margin: 0 auto;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.coin {
+    height: 70px;
+    width: 70px;
+    margin: 5px;
+
+    background-color: white;
+    border-radius: 50%;
+    border: 5px solid navy;
+    
+}
+
+.Red {
+    background-color: rgb(206, 35, 35);
+}
+
+.Yellow {
+    background-color: yellow;
+}
