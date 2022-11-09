@@ -144,21 +144,24 @@ class ConnectFour {
                 if (this.gameOver) {
                     return;
                 }
+                // //Future code to check who player is and have the function call accordingly.
+                // if(this.currentPlayer == this.player1) {
+                //     let playerMove = this.validMove(htmlNode);  
+                // } else {
+                //    let computerMove = this.validMove();// <--no param returns a list of all available moves
+                //}
 
 
-                
+
                 let playerMove = this.validMove(htmlNode);
-                //\ gets accepted move.  \/ alters page
-            
-                                
-                if (this.currentPlayer == this.player1) {
+                if (this.currentPlayer == this.player1) {  //I may move this into a function like validMove later.
                     playerMove.htmlElement.classList.add(this.player1.color);
                     this.currentPlayer = this.player2;
-    
+
                 } else {
                     playerMove.htmlElement.classList.add(this.player2.color);
                     this.currentPlayer = this.player1;
-                    
+
                 }
 
                 //this.minimax(this.currentGameState, this.player2.color) // clean up all minimax stuff NOW!
@@ -170,7 +173,9 @@ class ConnectFour {
     }
 
     validMove(htmlNode = null) {
-        
+
+
+
         if (htmlNode != null) {
             let coords = htmlNode.id.split('-'); //'0-0' -> [0,0]
 
@@ -178,18 +183,34 @@ class ConnectFour {
             let col = parseInt(coords[1]);
 
             row = this.availableMoves[col]; //pick the number at the index of col
-            if (row < 0) { //should call win-game method and call it a draw.
-                return;
-            }
-            
+
+
+
             let slotIndex = this.gameBoard[row][col]
             this.currentPlayer == this.player1 ? this.gameBoard[row][col] = 'Red' : this.gameBoard[row][col] = 'Yellow';
-            
+
             row--; //updating row height for the column
             this.availableMoves[col] = row; //update array
-            
+
             return slotIndex;
-        } //player if.
+            //player if.
+            //computer else.
+        } else { //this is buggy keep at it. keeps giving negative or OOB indexes for rows and columns.
+            let allValidMoves = [];
+            for (let columnIndex = 0; columnIndex < this.availableMoves.length; columnIndex++) {
+
+                let col = columnIndex;
+                let row = this.availableMoves[columnIndex];
+                console.log(`${row} and ${col}`)
+                if (row < 0) { //should call win-game method and call it a draw.
+                    return;
+                }
+                allValidMoves.push(this.gameBoard[row][col]) //this pushes a coordinate of each available move to check.
+            }
+
+            return allValidMoves;
+        }
+
     }
     currentGameState() {
         return this.gameBoard.flat();
