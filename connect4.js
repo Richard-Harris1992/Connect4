@@ -126,28 +126,19 @@ class ConnectFour {
         slotIndex.htmlElement.classList.add(this.player1.color);
         this.gameBoard[row][col] = 'Red'
 
-        let winner = this.checkWinner();
+        let winner = this.checkWinner(this.gameBoard);
 
-        if (winner) {
+        if (winner[0]) {
             return [row, col];
         }
 
         this.currentPlayer = this.player2;
         return;
     }
-
+   
     computerMove() {
-        let allValidMoves = [];
-        for (let columnIndex = 0; columnIndex < this.availableMoves.length; columnIndex++) {
-
-            let c = columnIndex;
-            let r = this.availableMoves[columnIndex];
-
-            if (r > 0) {
-                allValidMoves.push(this.gameBoard[r][c]) //this pushes a coordinate of each available move to check.
-            }
-        }
-
+        let allValidMoves = [...this.availableMovesForComputer()];
+      
         let computerChoice = allValidMoves[Math.floor(Math.random() * allValidMoves.length)];
         let coords = this.updateCoordinates(computerChoice);
         let row = coords[0];
@@ -158,15 +149,29 @@ class ConnectFour {
         slotIndex.htmlElement.classList.add(this.player2.color);
         this.gameBoard[row][col] = 'Yellow'
 
-        let winner = this.checkWinner();
+        let winner = this.checkWinner(this.gameBoard);
 
-        if (winner) {
+        if (winner[0]) {
             return [row, col];
         }
-
+        this.minimax()
         this.currentPlayer = this.player1;
         return;
 
+    }
+   
+    availableMovesForComputer() {
+        let allValidMoves = [];
+        for (let columnIndex = 0; columnIndex < this.availableMoves.length; columnIndex++) {
+
+            let c = columnIndex;
+            let r = this.availableMoves[columnIndex];
+
+            if (r > 0) {
+                allValidMoves.push(this.gameBoard[r][c]) //this pushes a coordinate of each available move to check.
+            }
+        }
+        return allValidMoves;
     }
 
     updateCoordinates(htmlNode) {
@@ -187,14 +192,14 @@ class ConnectFour {
         return currentMove;
     }
 
-    checkWinner() { //maybe see why diag-right is incorrect, but also see if I can just put gameboard[row][col] without any errors.
+    checkWinner(gameArray) { 
 
         //Horizontally right
         for (let r = 0; r < this.rows; r++) {
             for (let c = 0; c < this.columns - 3; c++) { //-3 is to allow checking 3 ahead without going out of bounds on the array.
-                if (this.gameBoard[r][c] != ' ') {
-                    if (this.gameBoard[r][c] == this.gameBoard[r][c + 1] && this.gameBoard[r][c + 1] == this.gameBoard[r][c + 2] && this.gameBoard[r][c + 2] == this.gameBoard[r][c + 3]) {
-                        return true;
+                if (gameArray[r][c] != ' ') {
+                    if (gameArray[r][c] == gameArray[r][c + 1] && gameArray[r][c + 1] == gameArray[r][c + 2] && gameArray[r][c + 2] == gameArray[r][c + 3]) {
+                        return [true, this.currentPlayer];
                     }
                 }
             }
@@ -203,9 +208,9 @@ class ConnectFour {
         //Horizontally left;
         for (let r = 0; r < this.rows; r++) {
             for (let c = 0; c < this.columns - 3; c++) { //-3 is to allow checking 3 ahead without going out of bounds on the array.
-                if (this.gameBoard[r][c] != ' ') {
-                    if (this.gameBoard[r][c] == this.gameBoard[r][c - 1] && this.gameBoard[r][c - 1] == this.gameBoard[r][c - 2] && this.gameBoard[r][c - 2] == this.gameBoard[r][c - 3]) {
-                        return true;
+                if (gameArray[r][c] != ' ') {
+                    if (gameArray[r][c] == gameArray[r][c - 1] && gameArray[r][c - 1] == gameArray[r][c - 2] && gameArray[r][c - 2] == gameArray[r][c - 3]) {
+                        return [true, this.currentPlayer];
                     }
                 }
             }
@@ -214,9 +219,9 @@ class ConnectFour {
         // Vertically
         for (let r = 0; r < this.rows - 3; r++) {
             for (let c = 0; c < this.columns; c++) {
-                if (this.gameBoard[r][c] != ' ') {
-                    if (this.gameBoard[r][c] == this.gameBoard[r + 1][c] && this.gameBoard[r + 1][c] == this.gameBoard[r + 2][c] && this.gameBoard[r + 2][c] == this.gameBoard[r + 3][c]) {
-                        return true;
+                if (gameArray[r][c] != ' ') {
+                    if (gameArray[r][c] == gameArray[r + 1][c] && gameArray[r + 1][c] == gameArray[r + 2][c] && gameArray[r + 2][c] == gameArray[r + 3][c]) {
+                        return [true, this.currentPlayer];
                     }
                 }
             }
@@ -227,9 +232,9 @@ class ConnectFour {
 
         for (let r = 0; r < this.rows - 3; r++) {
             for (let c = 0; c < this.columns - 3; c++) {
-                if (this.gameBoard[r][c] != ' ') {
-                    if (this.gameBoard[r][c] == this.gameBoard[r + 1][c + 1] && this.gameBoard[r + 1][c + 1] == this.gameBoard[r + 2][c + 2] && this.gameBoard[r + 2][c + 2] == this.gameBoard[r + 3][c + 3]) {
-                        return true;
+                if (gameArray[r][c] != ' ') {
+                    if (gameArray[r][c] == gameArray[r + 1][c + 1] && gameArray[r + 1][c + 1] == gameArray[r + 2][c + 2] && gameArray[r + 2][c + 2] == gameArray[r + 3][c + 3]) {
+                        return [true, this.currentPlayer];
                     }
                 }
             }
@@ -239,9 +244,9 @@ class ConnectFour {
 
         for (let r = 3; r < this.rows; r++) {
             for (let c = 0; c < this.columns - 3; c++) {
-                if (this.gameBoard[r][c] != ' ') {
-                    if (this.gameBoard[r][c] == this.gameBoard[r - 1][c + 1] && this.gameBoard[r - 1][c + 1] == this.gameBoard[r - 2][c + 2] && this.gameBoard[r - 2][c + 2] == this.gameBoard[r - 3][c + 3]) {
-                        return true;
+                if (gameArray[r][c] != ' ') {
+                    if (gameArray[r][c] == gameArray[r - 1][c + 1] && gameArray[r - 1][c + 1] == gameArray[r - 2][c + 2] && gameArray[r - 2][c + 2] == gameArray[r - 3][c + 3]) {
+                        return [true, this.currentPlayer];
                     }
                 }
             }
@@ -268,14 +273,34 @@ class ConnectFour {
     }
 
     minimax() {
+       // let gameboardArray = [...this.gameBoard]; // this is a hard copied value of the current gameboard array.
+        let currentState = this.gameBoard.map(a => Object.assign({}, a))
+        let availableMoves = [...this.availableMovesForComputer()];
+        
+        
 
-        /* code here */
+        //get current state of game.
+        //check each available move (loop) and put the player marker in its place.
+            //if this causes the player to win, put the marker in its spot.
+            //else random.
+
+        for(let i = 0; i < availableMoves.length; i++) {
+            let coords = availableMoves[i].id.split('-');
+            let row = parseInt(coords[0]);
+            let col = parseInt(coords[1]);
+            console.log(this.gameBoard)
+            currentState[row][col] = 'Red';
+            //console.log(this.checkWinner(currentState));
+            
+        }
+        
 
     }
 
-    currentGameState() {
-        return this.gameBoard.flat();
-    }
+    // currentGameState(array) { //Might delete this if I do not need the flat function applied.
+    //     let currentGame = array.flat();
+    //     return currentGame;
+    // }
 
     currentEmptySlots() {
         let arr = this.currentGameState();
