@@ -60,9 +60,10 @@ class ConnectFour {
         this.availableMoves = [5, 5, 5, 5, 5, 5, 5]; //this array keeps the coins from floating, they will fall into the bottom most row.
         this.gameOver = false;
         this.gameBoard = []
-        this.gameBoardBuilder = this.setGame();
+        this.gameBoardBuilder = this.createBoard();
     }
-    setGame() {
+
+    createBoard() {
 
         for (let row = 0; row < this.rows; row++) {
             let rows = [];
@@ -84,9 +85,7 @@ class ConnectFour {
 
     }
 
-
-
-    clickEvent() { ///THIS MIGHT BE MY MAIN FXN inside click event. like the click event will trigger minimax and check fxn
+    clickEvent() { 
 
         let flattenedGameboardArray = this.gameBoard.flat()
         flattenedGameboardArray.forEach(coin => {
@@ -96,45 +95,23 @@ class ConnectFour {
                 if (this.gameOver) {
                     return;
                 }
-
-                if (this.currentPlayer == this.player1) {
-                    this.validMove(htmlNode);
-
-                }
+                this.playRound(htmlNode);  
             }); //end eventListener function
         });
 
     }
 
-    updateCoordinates(htmlNode) {
-        let coords = htmlNode.id.split('-'); //'0-0' -> [0,0]
-
-        let row = parseInt(coords[0]);
-        let col = parseInt(coords[1]);
-
-        row = this.availableMoves[col]; //Places the coin in the lowest row on that column
-        //This prevents an OOB Exception
-        if (row < 0) {
-            return
-        }
-
-        let currentMove = [row, col];
-        row--; //updating row height for the column
-        this.availableMoves[col] = row; //update array
-        return currentMove;
-    }
-
-    validMove(htmlNode = null) {
+    playRound(htmlNode = null) {
         let playerCoords = this.playerMove(htmlNode);
         if( playerCoords != null) {
-           this.setWinner(playerCoords[0], playerCoords[1]);
+           this.declareWinner(playerCoords[0], playerCoords[1]);
            return
         }
         
        
         let computerCoords = this.computerMove();
         if( computerCoords != null) {
-            this.setWinner(computerCoords[0], computerCoords[1])
+            this.declareWinner(computerCoords[0], computerCoords[1])
             return
          }
     }
@@ -156,8 +133,9 @@ class ConnectFour {
         }
 
         this.currentPlayer = this.player2;
-        return null;
+        return;
     }
+
     computerMove() {
         let allValidMoves = [];
         for (let columnIndex = 0; columnIndex < this.availableMoves.length; columnIndex++) {
@@ -187,22 +165,28 @@ class ConnectFour {
         }
 
         this.currentPlayer = this.player1;
-        return null;
+        return;
 
     }
-    currentGameState() {
-        return this.gameBoard.flat();
-    }
-    minimax() {
 
-        /* code here */
+    updateCoordinates(htmlNode) {
+        let coords = htmlNode.id.split('-'); //'0-0' -> [0,0]
 
+        let row = parseInt(coords[0]);
+        let col = parseInt(coords[1]);
+
+        row = this.availableMoves[col]; //Places the coin in the lowest row on that column
+        //This prevents an OOB Exception
+        if (row < 0) {
+            return
+        }
+
+        let currentMove = [row, col];
+        row--; //updating row height for the column
+        this.availableMoves[col] = row; //update array
+        return currentMove;
     }
-    currentEmptySlots() {
-        let arr = this.currentGameState();
-        arr.filter(empty => typeof empty == 'object');
-        return arr;
-    }
+
     checkWinner() { //maybe see why diag-right is incorrect, but also see if I can just put gameboard[row][col] without any errors.
 
         //Horizontally right
@@ -266,22 +250,38 @@ class ConnectFour {
         return false;
     }
 
-    setWinner(r, c) {
+    declareWinner(r, c) {
         let winner = document.getElementById('winner');
+        winner.style.color = 'white';
 
         if (this.gameBoard[r][c] == this.player1.color) {
             winner.textContent = 'The Player Wins!!!';
             this.gameOver = true;
-            //return -1;
+           
         }
         
         if (this.gameBoard[r][c] == this.player2.color) {
             winner.textContent = 'The Computer wins!';
             this.gameOver = true;
-            //return 1;
+           
         }
     }
 
+    minimax() {
+
+        /* code here */
+
+    }
+
+    currentGameState() {
+        return this.gameBoard.flat();
+    }
+
+    currentEmptySlots() {
+        let arr = this.currentGameState();
+        arr.filter(empty => typeof empty == 'object');
+        return arr;
+    }
 }
 
 
