@@ -67,15 +67,11 @@ class ConnectFour {
         for (let row = 0; row < this.rows; row++) {
             let rows = [];
             for (let col = 0; col < this.columns; col++) {
-
-
                 //HTML
-
                 let coin = document.createElement('div');
                 coin.id = `${row}-${col}`;
                 coin.classList.add('coin');
                 let tileObj = new Coin(coin.id, coin);
-
 
                 document.getElementById('board').appendChild(coin);
                 rows.push(tileObj);
@@ -88,13 +84,14 @@ class ConnectFour {
 
     }
     //test area for minimaxx fxn
-    minimax(currentBoardState, computerColorOnBoard) {
+    minimax() {
         let currentGameState = this.currentGameState();
         let computerMarker = this.player2.color;
-        console.log(currentGameState);
-        console.log(computerMarker);
-        let currentEmptyCells = currentGameState.filter(slots => typeof slots == 'object');
-        console.log(currentEmptyCells);
+        let currentPlayableCells = this.validMove();
+        // console.log(`current cells ${currentPlayableCells}`);
+        // console.log(`Marker ${computerMarker}`);
+        // console.log(`current game state ${currentGameState}`);
+        
 
 
 
@@ -117,11 +114,11 @@ class ConnectFour {
                 if (this.gameOver) {
                     return;
                 }
-                //Future code to check who player is and have the function call accordingly.
+                
                 if(this.currentPlayer == this.player1) {
-                    let playerMove = this.validMove(htmlNode);  
+                     this.validMove(htmlNode);  
                 } else {
-                   let computerMove = this.validMove();// <--no param returns a list of all available moves
+                    this.minimax();// <--no param returns a list of all available moves
                 }
             }); //end eventListener function
         });
@@ -146,7 +143,7 @@ class ConnectFour {
 
             let slotIndex = this.gameBoard[row][col];
             
-            //change this when functionality permits as far as computer playability \/
+            //change this when functionality permits as far as computer playability \/ maybe add player1 outside this fxn, return like the else;
             if (this.currentPlayer == this.player1) {  
                 slotIndex.htmlElement.classList.add(this.player1.color);
                 this.gameBoard[row][col] = 'Red' 
@@ -183,12 +180,7 @@ class ConnectFour {
                 let row = this.availableMoves[columnIndex];
                 
                 if (row > 0) {
-                console.log(`${row} and ${col}`)
-                console.log(this.gameBoard[row][col]);
-                if (row < 0) {
-                    return;
-                }
-                allValidMoves.push(this.gameBoard[row][col]) //this pushes a coordinate of each available move to check.
+                    allValidMoves.push(this.gameBoard[row][col]) //this pushes a coordinate of each available move to check.
                 }
             }
             this.currentPlayer = this.player1;
