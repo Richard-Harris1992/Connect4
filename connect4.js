@@ -14,7 +14,7 @@ I need a function that will run through empty slots and see if they pick one val
 
 I think for to pass the either current state or available state it would look like
 
-
+************No pieces left board for draws*****************************
 
 end goal is flexibility of methods needed to propery use minimax.
 
@@ -83,26 +83,8 @@ class ConnectFour {
         this.clickEvent();
 
     }
-    //test area for minimaxx fxn
-    minimax() {
-        let currentGameState = this.currentGameState();
-        let computerMarker = this.player2.color;
-        let currentPlayableCells = this.validMove();
-        // console.log(`current cells ${currentPlayableCells}`);
-        // console.log(`Marker ${computerMarker}`);
-        // console.log(`current game state ${currentGameState}`);
-        
 
 
-
-
-
-
-
-
-
-
-    }
 
     clickEvent() { ///THIS MIGHT BE MY MAIN FXN inside click event. like the click event will trigger minimax and check fxn
 
@@ -114,87 +96,116 @@ class ConnectFour {
                 if (this.gameOver) {
                     return;
                 }
-                
-                if(this.currentPlayer == this.player1) {
-                     this.validMove(htmlNode);  
-                } else {
-                    this.minimax();// <--no param returns a list of all available moves
+
+                if (this.currentPlayer == this.player1) {
+                    this.validMove(htmlNode);
+
                 }
             }); //end eventListener function
         });
 
     }
 
-    validMove(htmlNode = null) {
+    updateCoordinates(htmlNode) {
+        let coords = htmlNode.id.split('-'); //'0-0' -> [0,0]
 
+        let row = parseInt(coords[0]);
+        let col = parseInt(coords[1]);
 
-
-        if (htmlNode != null) {
-            let coords = htmlNode.id.split('-'); //'0-0' -> [0,0]
-
-            let row = parseInt(coords[0]);
-            let col = parseInt(coords[1]);
-
-            row = this.availableMoves[col]; //Places the coin in the lowest row on that column
-            //This prevents an OOB Exception
-            if(row < 0) { 
-                return
-            }
-
-            let slotIndex = this.gameBoard[row][col];
-            
-            //change this when functionality permits as far as computer playability \/ maybe add player1 outside this fxn, return like the else;
-            if (this.currentPlayer == this.player1) {  
-                slotIndex.htmlElement.classList.add(this.player1.color);
-                this.gameBoard[row][col] = 'Red' 
-                
-                let winner = this.checkWinner(row, col);
-                if(winner) {
-                    this.setWinner(row, col)
-                }
-                this.currentPlayer = this.player2;
-            //for player2
-            // } else { 
-            //     slotIndex.htmlElement.classList.add(this.player2.color);
-            //     this.gameBoard[row][col] = 'Yellow'
-                
-            //     let winner = this.checkWinner(row, col);
-            //     if(winner) {
-            //         this.setWinner(row, col)
-            //     }
-            //     this.currentPlayer = this.player1;
-             }
-            
-            
-            row--; //updating row height for the column
-            this.availableMoves[col] = row; //update array
-
-            return slotIndex;
-            //player if.
-            //computer else.
-        } else { //this is buggy keep at it. keeps giving negative or OOB indexes for rows and columns.
-            let allValidMoves = [];
-            for (let columnIndex = 0; columnIndex < this.availableMoves.length; columnIndex++) {
-
-                let col = columnIndex;
-                let row = this.availableMoves[columnIndex];
-                
-                if (row > 0) {
-                    allValidMoves.push(this.gameBoard[row][col]) //this pushes a coordinate of each available move to check.
-                }
-            }
-            this.currentPlayer = this.player1;
-            return allValidMoves;
+        row = this.availableMoves[col]; //Places the coin in the lowest row on that column
+        //This prevents an OOB Exception
+        if (row < 0) {
+            return
         }
+
+        let currentMove = [row, col];
+        row--; //updating row height for the column
+        this.availableMoves[col] = row; //update array
+        return currentMove;
+    }
+
+    validMove(htmlNode = null) {
+        let playerCoords = this.playerMove(htmlNode);
+        if( playerCoords != null) {
+           this.setWinner(playerCoords[0], playerCoords[1]);
+           return
+        }
+        
+       
+        let computerCoords = this.computerMove();
+        if( computerCoords != null) {
+            this.setWinner(computerCoords[0], computerCoords[1])
+            return
+         }
+    }
+
+    playerMove(htmlNode) {
+        let coords = this.updateCoordinates(htmlNode);
+        let row = coords[0];
+        let col = coords[1];
+
+        let slotIndex = this.gameBoard[row][col];
+
+        slotIndex.htmlElement.classList.add(this.player1.color);
+        this.gameBoard[row][col] = 'Red'
+
+        let winner = this.checkWinner();
+
+        if (winner) {
+            return [row, col];
+        }
+
+        this.currentPlayer = this.player2;
+        return null;
+    }
+    computerMove() {
+        let allValidMoves = [];
+        for (let columnIndex = 0; columnIndex < this.availableMoves.length; columnIndex++) {
+
+            let c = columnIndex;
+            let r = this.availableMoves[columnIndex];
+
+            if (r > 0) {
+                allValidMoves.push(this.gameBoard[r][c]) //this pushes a coordinate of each available move to check.
+            }
+        }
+
+        let computerChoice = allValidMoves[Math.floor(Math.random() * allValidMoves.length)];
+        let coords = this.updateCoordinates(computerChoice);
+        let row = coords[0];
+        let col = coords[1];
+
+        let slotIndex = this.gameBoard[row][col];
+
+        slotIndex.htmlElement.classList.add(this.player2.color);
+        this.gameBoard[row][col] = 'Yellow'
+
+        let winner = this.checkWinner();
+
+        if (winner) {
+            return [row, col];
+        }
+
+        this.currentPlayer = this.player1;
+        return null;
 
     }
     currentGameState() {
         return this.gameBoard.flat();
     }
+    minimax() {
 
-    checkWinner(r, c) {
-        
-        //Horizontally
+        /* code here */
+
+    }
+    currentEmptySlots() {
+        let arr = this.currentGameState();
+        arr.filter(empty => typeof empty == 'object');
+        return arr;
+    }
+    checkWinner() { //maybe see why diag-right is incorrect, but also see if I can just put gameboard[row][col] without any errors.
+
+        //Horizontally right
         for (let r = 0; r < this.rows; r++) {
             for (let c = 0; c < this.columns - 3; c++) { //-3 is to allow checking 3 ahead without going out of bounds on the array.
                 if (this.gameBoard[r][c] != ' ') {
@@ -204,6 +215,18 @@ class ConnectFour {
                 }
             }
         }
+
+        //Horizontally left;
+        for (let r = 0; r < this.rows; r++) {
+            for (let c = 0; c < this.columns - 3; c++) { //-3 is to allow checking 3 ahead without going out of bounds on the array.
+                if (this.gameBoard[r][c] != ' ') {
+                    if (this.gameBoard[r][c] == this.gameBoard[r][c - 1] && this.gameBoard[r][c - 1] == this.gameBoard[r][c - 2] && this.gameBoard[r][c - 2] == this.gameBoard[r][c - 3]) {
+                        return true;
+                    }
+                }
+            }
+        }
+
         // Vertically
         for (let r = 0; r < this.rows - 3; r++) {
             for (let c = 0; c < this.columns; c++) {
@@ -216,6 +239,8 @@ class ConnectFour {
         }
 
         //Diagonally-Left
+
+
         for (let r = 0; r < this.rows - 3; r++) {
             for (let c = 0; c < this.columns - 3; c++) {
                 if (this.gameBoard[r][c] != ' ') {
@@ -227,6 +252,7 @@ class ConnectFour {
         }
 
         //Diagonaally-Right
+
         for (let r = 3; r < this.rows; r++) {
             for (let c = 0; c < this.columns - 3; c++) {
                 if (this.gameBoard[r][c] != ' ') {
@@ -236,17 +262,24 @@ class ConnectFour {
                 }
             }
         }
+
         return false;
     }
 
     setWinner(r, c) {
         let winner = document.getElementById('winner');
+
         if (this.gameBoard[r][c] == this.player1.color) {
             winner.textContent = 'The Player Wins!!!';
-        } else {
-            winner.textContent = 'The Computer wins!';
+            this.gameOver = true;
+            //return -1;
         }
-        this.gameOver = true;
+        
+        if (this.gameBoard[r][c] == this.player2.color) {
+            winner.textContent = 'The Computer wins!';
+            this.gameOver = true;
+            //return 1;
+        }
     }
 
 }
