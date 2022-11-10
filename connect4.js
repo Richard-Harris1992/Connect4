@@ -117,7 +117,7 @@ class ConnectFour {
     }
 
     playerMove(htmlNode) {
-        let coords = this.updateCoordinates(htmlNode);
+        let coords = this.sinkCoin(htmlNode);
         let row = coords[0];
         let col = coords[1];
 
@@ -128,7 +128,7 @@ class ConnectFour {
 
         let winner = this.checkWinner(this.gameBoard);
 
-        if (winner[0]) {
+        if (winner) {
             return [row, col];
         }
 
@@ -137,24 +137,37 @@ class ConnectFour {
     }
    
     computerMove() {
+        let slotIndex;
+        let row;
+        let col;
+
         let allValidMoves = [...this.availableMovesForComputer()];
-      
-        let computerChoice = allValidMoves[Math.floor(Math.random() * allValidMoves.length)];
-        let coords = this.updateCoordinates(computerChoice);
-        let row = coords[0];
-        let col = coords[1];
+        let isThereAnEndMove = this.minimax()
+       
+        if(isThereAnEndMove == false) {
+            let computerChoice = allValidMoves[Math.floor(Math.random() * allValidMoves.length)];
+            console.log(computerChoice)
+            let coords = this.sinkCoin(computerChoice);
+            row = coords[0];
+            col = coords[1];
+            slotIndex = this.gameBoard[row][col];
 
-        let slotIndex = this.gameBoard[row][col];
-
+        } else {
+            row = isThereAnEndMove[0];
+            col = isThereAnEndMove[1];
+            slotIndex = this.gameBoard[row][col];
+            this.updateCoordinates(row, col);
+            console.log(this.availableMoves)
+        }
+        
         slotIndex.htmlElement.classList.add(this.player2.color);
         this.gameBoard[row][col] = 'Yellow'
-
         let winner = this.checkWinner(this.gameBoard);
 
-        if (winner[0]) {
+        if (winner) {
             return [row, col];
         }
-        this.minimax()
+        
         this.currentPlayer = this.player1;
         return;
 
@@ -171,10 +184,11 @@ class ConnectFour {
                 allValidMoves.push(this.gameBoard[r][c]) //this pushes a coordinate of each available move to check.
             }
         }
+        console.log(allValidMoves)
         return allValidMoves;
     }
 
-    updateCoordinates(htmlNode) {
+    sinkCoin(htmlNode) {
         let coords = htmlNode.id.split('-'); //'0-0' -> [0,0]
 
         let row = parseInt(coords[0]);
@@ -187,10 +201,15 @@ class ConnectFour {
         }
 
         let currentMove = [row, col];
-        row--; //updating row height for the column
-        this.availableMoves[col] = row; //update array
+        this.updateCoordinates(row, col);
         return currentMove;
     }
+
+    updateCoordinates(row, col) {
+        row--;
+        this.availableMoves[col] = row;
+    }
+
 
     checkWinner(gameArray) { 
 
@@ -199,7 +218,7 @@ class ConnectFour {
             for (let c = 0; c < this.columns - 3; c++) { //-3 is to allow checking 3 ahead without going out of bounds on the array.
                 if (gameArray[r][c] != ' ') {
                     if (gameArray[r][c] == gameArray[r][c + 1] && gameArray[r][c + 1] == gameArray[r][c + 2] && gameArray[r][c + 2] == gameArray[r][c + 3]) {
-                        return [true, this.currentPlayer];
+                        return true;
                     }
                 }
             }
@@ -210,7 +229,7 @@ class ConnectFour {
             for (let c = 0; c < this.columns - 3; c++) { //-3 is to allow checking 3 ahead without going out of bounds on the array.
                 if (gameArray[r][c] != ' ') {
                     if (gameArray[r][c] == gameArray[r][c - 1] && gameArray[r][c - 1] == gameArray[r][c - 2] && gameArray[r][c - 2] == gameArray[r][c - 3]) {
-                        return [true, this.currentPlayer];
+                        return true;
                     }
                 }
             }
@@ -221,7 +240,7 @@ class ConnectFour {
             for (let c = 0; c < this.columns; c++) {
                 if (gameArray[r][c] != ' ') {
                     if (gameArray[r][c] == gameArray[r + 1][c] && gameArray[r + 1][c] == gameArray[r + 2][c] && gameArray[r + 2][c] == gameArray[r + 3][c]) {
-                        return [true, this.currentPlayer];
+                        return true;
                     }
                 }
             }
@@ -234,7 +253,7 @@ class ConnectFour {
             for (let c = 0; c < this.columns - 3; c++) {
                 if (gameArray[r][c] != ' ') {
                     if (gameArray[r][c] == gameArray[r + 1][c + 1] && gameArray[r + 1][c + 1] == gameArray[r + 2][c + 2] && gameArray[r + 2][c + 2] == gameArray[r + 3][c + 3]) {
-                        return [true, this.currentPlayer];
+                        return true;
                     }
                 }
             }
@@ -246,7 +265,7 @@ class ConnectFour {
             for (let c = 0; c < this.columns - 3; c++) {
                 if (gameArray[r][c] != ' ') {
                     if (gameArray[r][c] == gameArray[r - 1][c + 1] && gameArray[r - 1][c + 1] == gameArray[r - 2][c + 2] && gameArray[r - 2][c + 2] == gameArray[r - 3][c + 3]) {
-                        return [true, this.currentPlayer];
+                        return true;
                     }
                 }
             }
@@ -276,7 +295,7 @@ class ConnectFour {
        // let gameboardArray = [...this.gameBoard]; // this is a hard copied value of the current gameboard array.
         let currentState = this.gameBoard.map(a => Object.assign({}, a))
         let availableMoves = [...this.availableMovesForComputer()];
-        
+        let nextPlay = [];
         
 
         //get current state of game.
@@ -285,14 +304,25 @@ class ConnectFour {
             //else random.
 
         for(let i = 0; i < availableMoves.length; i++) {
+            let prevElement = availableMoves[i];
+            console.log(`this is pre move ${prevElement}`);
             let coords = availableMoves[i].id.split('-');
             let row = parseInt(coords[0]);
             let col = parseInt(coords[1]);
-            console.log(this.gameBoard)
+           
             currentState[row][col] = 'Red';
-            //console.log(this.checkWinner(currentState));
-            
+            let winner = this.checkWinner(currentState);
+            //console.log(winner)
+            if(winner) {
+                nextPlay.push(row);
+                nextPlay.push(col);
+                return nextPlay;
+            } else {
+                currentState[row][col] = prevElement;
+            }
         }
+        //console.log(currentState);
+        return false;
         
 
     }
