@@ -84,7 +84,7 @@ class ConnectFour {
         }
 
         //after creating all coin slots, this loops through the gameboard array and attaches event listeners to the slots.
-        this.addColorChangeClickEvent();
+        this.clickEvent();
 
     }
     //test area for minimaxx fxn
@@ -107,7 +107,7 @@ class ConnectFour {
 
     }
 
-    addColorChangeClickEvent() { ///THIS MIGHT BE MY MAIN FXN inside click event. like the click event will trigger minimax and check fxn
+    clickEvent() { ///THIS MIGHT BE MY MAIN FXN inside click event. like the click event will trigger minimax and check fxn
 
         let flattenedGameboardArray = this.gameBoard.flat()
         flattenedGameboardArray.forEach(coin => {
@@ -117,21 +117,12 @@ class ConnectFour {
                 if (this.gameOver) {
                     return;
                 }
-                // //Future code to check who player is and have the function call accordingly.
-                // if(this.currentPlayer == this.player1) {
-                //     let playerMove = this.validMove(htmlNode);  
-                // } else {
-                //    let computerMove = this.validMove();// <--no param returns a list of all available moves
-                //}
-
-
-
-                 this.validMove(htmlNode);
-            
-
-                //this.minimax(this.currentGameState, this.player2.color) // clean up all minimax stuff NOW!
-                
-               
+                //Future code to check who player is and have the function call accordingly.
+                if(this.currentPlayer == this.player1) {
+                    let playerMove = this.validMove(htmlNode);  
+                } else {
+                   let computerMove = this.validMove();// <--no param returns a list of all available moves
+                }
             }); //end eventListener function
         });
 
@@ -148,8 +139,8 @@ class ConnectFour {
             let col = parseInt(coords[1]);
 
             row = this.availableMoves[col]; //Places the coin in the lowest row on that column
-            
-            if(row < 0) {
+            //This prevents an OOB Exception
+            if(row < 0) { 
                 return
             }
 
@@ -166,16 +157,16 @@ class ConnectFour {
                 }
                 this.currentPlayer = this.player2;
             //for player2
-            } else { 
-                slotIndex.htmlElement.classList.add(this.player2.color);
-                this.gameBoard[row][col] = 'Yellow'
+            // } else { 
+            //     slotIndex.htmlElement.classList.add(this.player2.color);
+            //     this.gameBoard[row][col] = 'Yellow'
                 
-                let winner = this.checkWinner(row, col);
-                if(winner) {
-                    this.setWinner(row, col)
-                }
-                this.currentPlayer = this.player1;
-            }
+            //     let winner = this.checkWinner(row, col);
+            //     if(winner) {
+            //         this.setWinner(row, col)
+            //     }
+            //     this.currentPlayer = this.player1;
+             }
             
             
             row--; //updating row height for the column
@@ -190,13 +181,17 @@ class ConnectFour {
 
                 let col = columnIndex;
                 let row = this.availableMoves[columnIndex];
+                
+                if (row > 0) {
                 console.log(`${row} and ${col}`)
-                if (row < 0) { //should call win-game method and call it a draw.
+                console.log(this.gameBoard[row][col]);
+                if (row < 0) {
                     return;
                 }
                 allValidMoves.push(this.gameBoard[row][col]) //this pushes a coordinate of each available move to check.
+                }
             }
-
+            this.currentPlayer = this.player1;
             return allValidMoves;
         }
 
