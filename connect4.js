@@ -4,7 +4,7 @@
 Make styling prettier / add more to this
 Add slots left / if 42 change textContent to a draw
 Try to break all these long pieces of code to smaller functions. / clean this stuff up.
-
+add a timeout fxn on player move to slow down the decision making, better UI
 ****Bonus***
 add a check for a win on the minimax function to actively search to win.
 maybe turn this into an actual minimax or at least go another layer deep.
@@ -50,6 +50,7 @@ class ConnectFour {
         this.gameOver = false;
         this.gameBoard = []
         this.gameBoardBuilder = this.createBoard();
+        this.counter = 0;
     }
 
     createBoard() {
@@ -122,6 +123,7 @@ class ConnectFour {
         }
 
         this.currentPlayer = this.player2;
+        this.counter++
         return;
     }
    
@@ -131,9 +133,9 @@ class ConnectFour {
         let col;
 
         let allValidMoves = [...this.availableMovesForComputer()];
-        let isThereAnEndMove = this.computerChoice()
+        let computerDecision = this.computerChoice()
        
-        if(isThereAnEndMove == false) {
+        if(computerDecision == false) {
             let computerChoice = allValidMoves[Math.floor(Math.random() * allValidMoves.length)];
             console.log(computerChoice)
             let coords = this.sinkCoin(computerChoice);
@@ -142,8 +144,8 @@ class ConnectFour {
             slotIndex = this.gameBoard[row][col];
 
         } else {
-            row = isThereAnEndMove[0];
-            col = isThereAnEndMove[1];
+            row = computerDecision[0];
+            col = computerDecision[1];
             slotIndex = this.gameBoard[row][col];
             this.updateCoordinates(row, col);
             console.log(this.availableMoves)
@@ -158,6 +160,7 @@ class ConnectFour {
         }
         
         this.currentPlayer = this.player1;
+        this.counter++
         return;
 
     }
@@ -259,6 +262,7 @@ class ConnectFour {
             }
         }
 
+
         return false;
     }
 
@@ -267,7 +271,7 @@ class ConnectFour {
         winner.style.color = 'white';
 
         if (this.gameBoard[r][c] == this.player1.color) {
-            winner.textContent = 'The Player Wins!!!';
+            winner.textContent = 'The Player Wins!';
             this.gameOver = true;
            
         }
@@ -277,6 +281,11 @@ class ConnectFour {
             this.gameOver = true;
            
         }
+
+        // if(this.counter == 42) {
+        //     winner.textContent = 'The game is a draw!';
+        //     this.gameOver = true;
+        // }
     }
 
     computerChoice() {
@@ -285,11 +294,7 @@ class ConnectFour {
         let availableMoves = [...this.availableMovesForComputer()];
         let nextPlay = [];
         
-
-        //get current state of game.
-        //check each available move (loop) and put the player marker in its place.
-            //if this causes the player to win, put the marker in its spot.
-            //else random.
+        //This loops through all available moves and blocks red if the move in question would cause red to win.
 
         for(let i = 0; i < availableMoves.length; i++) {
             let prevElement = availableMoves[i];
@@ -300,7 +305,7 @@ class ConnectFour {
            
             currentState[row][col] = 'Red';
             let winner = this.checkWinner(currentState);
-            //console.log(winner)
+            
             if(winner) {
                 nextPlay.push(row);
                 nextPlay.push(col);
@@ -309,7 +314,7 @@ class ConnectFour {
                 currentState[row][col] = prevElement;
             }
         }
-        //console.log(currentState);
+        
         return false;
         
 
