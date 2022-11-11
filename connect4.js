@@ -1,24 +1,13 @@
 
+/*
+****************** Checklist**************
+Make styling prettier / add more to this
+Add slots left / if 42 change textContent to a draw
+Try to break all these long pieces of code to smaller functions. / clean this stuff up.
 
-//maybe see how I can break these methods into smaller methods.
-//space for minimax
-
-/*after each turn update currentGameStateMethod 'Red', 'Yellow' or 'Coin' <--representing an empty slot
-
-const currentEmptyCells = (CurrentGameStateMethod()) => currentGameStateMethod().filter(slots => slots == 'Coin')
-
-I think just returning the gameOver prop will satisfy the checking if there is a winner. step 5
-
-
-I need a function that will run through empty slots and see if they pick one value then they will win.
-
-I think for to pass the either current state or available state it would look like
-
-************No pieces left board for draws*****************************
-
-end goal is flexibility of methods needed to propery use minimax.
-
-
+****Bonus***
+add a check for a win on the minimax function to actively search to win.
+maybe turn this into an actual minimax or at least go another layer deep.
 */
 
 
@@ -142,7 +131,7 @@ class ConnectFour {
         let col;
 
         let allValidMoves = [...this.availableMovesForComputer()];
-        let isThereAnEndMove = this.minimax()
+        let isThereAnEndMove = this.computerChoice()
        
         if(isThereAnEndMove == false) {
             let computerChoice = allValidMoves[Math.floor(Math.random() * allValidMoves.length)];
@@ -209,7 +198,6 @@ class ConnectFour {
         row--;
         this.availableMoves[col] = row;
     }
-
 
     checkWinner(gameArray) { 
 
@@ -291,7 +279,7 @@ class ConnectFour {
         }
     }
 
-    minimax() {
+    computerChoice() {
        // let gameboardArray = [...this.gameBoard]; // this is a hard copied value of the current gameboard array.
         let currentState = this.gameBoard.map(a => Object.assign({}, a))
         let availableMoves = [...this.availableMovesForComputer()];
@@ -325,17 +313,6 @@ class ConnectFour {
         return false;
         
 
-    }
-
-    // currentGameState(array) { //Might delete this if I do not need the flat function applied.
-    //     let currentGame = array.flat();
-    //     return currentGame;
-    // }
-
-    currentEmptySlots() {
-        let arr = this.currentGameState();
-        arr.filter(empty => typeof empty == 'object');
-        return arr;
     }
 }
 
