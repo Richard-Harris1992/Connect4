@@ -180,7 +180,7 @@ class ConnectFour {
             let c = columnIndex;
             let r = this.availableMoves[columnIndex];
 
-            if (r > 0) {
+            if (r >= 0) {
                 allValidMoves.push(this.gameBoard[r][c]) //this pushes a coordinate of each available move to check.
             }
         }
@@ -305,7 +305,7 @@ class ConnectFour {
 
         for(let i = 0; i < availableMoves.length; i++) {
             let prevElement = availableMoves[i];
-            console.log(`this is pre move ${prevElement}`);
+            //console.log(`this is pre move ${prevElement}`);
             let coords = availableMoves[i].id.split('-');
             let row = parseInt(coords[0]);
             let col = parseInt(coords[1]);
