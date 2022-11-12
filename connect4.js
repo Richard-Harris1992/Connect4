@@ -4,7 +4,7 @@
 Make styling prettier / add more to this
 Add slots left / if 42 change textContent to a draw
 Try to break all these long pieces of code to smaller functions. / clean this stuff up.
-
+add a timeout fxn on player move to slow down the decision making, better UI
 ****Bonus***
 add a check for a win on the minimax function to actively search to win.
 maybe turn this into an actual minimax or at least go another layer deep.
@@ -16,18 +16,24 @@ class Player {
     constructor() {
         this.name = 'Player';
         this.color = 'Red';
+        this.next = null
     }
-    attack(slots, availableMoves) {
-        //slots is gameBoard, available news is currentSlots.
-        let divOFslot = divs
 
+    playerMove(htmlNode) {
+
+        let coords = htmlNode.id.split('-'); //'0-0' -> [0,0]
+        let row = parseInt(coords[0]);
+        let col = parseInt(coords[1]);
+        return [row, col];
     }
+
 }
 class Computer extends Player {
     constructor() {
         super();
         this.name = 'Computer';
         this.color = 'Yellow';
+        this.next = null
     }
 }
 
@@ -50,9 +56,13 @@ class ConnectFour {
         this.gameOver = false;
         this.gameBoard = []
         this.gameBoardBuilder = this.createBoard();
+        this.counter = 0;
+        
     }
 
     createBoard() {
+            this.player1.next = this.player2; //node structure to get next player.
+            this.player2.next = this.player1;
 
         for (let row = 0; row < this.rows; row++) {
             let rows = [];
@@ -74,7 +84,7 @@ class ConnectFour {
 
     }
 
-    clickEvent() { 
+    clickEvent() {
 
         let flattenedGameboardArray = this.gameBoard.flat()
         flattenedGameboardArray.forEach(coin => {
@@ -83,85 +93,97 @@ class ConnectFour {
             htmlNode.addEventListener('click', (e) => {
                 if (this.gameOver) {
                     return;
+                } else {
+                    this.playRound(htmlNode);  
                 }
-                this.playRound(htmlNode);  
             }); //end eventListener function
         });
 
     }
 
-    playRound(htmlNode = null) {
-        let playerCoords = this.playerMove(htmlNode);
-        if( playerCoords != null) {
-           this.declareWinner(playerCoords[0], playerCoords[1]);
-           return
-        }
-        
-       
-        let computerCoords = this.computerMove();
-        if( computerCoords != null) {
-            this.declareWinner(computerCoords[0], computerCoords[1])
-            return
-         }
-    }
-
-    playerMove(htmlNode) {
-        let coords = this.sinkCoin(htmlNode);
-        let row = coords[0];
-        let col = coords[1];
-
-        let slotIndex = this.gameBoard[row][col];
-
-        slotIndex.htmlElement.classList.add(this.player1.color);
-        this.gameBoard[row][col] = 'Red'
-
-        let winner = this.checkWinner(this.gameBoard);
-
-        if (winner) {
-            return [row, col];
-        }
-
-        this.currentPlayer = this.player2;
-        return;
-    }
-   
-    computerMove() {
-        let slotIndex;
-        let row;
-        let col;
-
-        let allValidMoves = [...this.availableMovesForComputer()];
-        let isThereAnEndMove = this.computerChoice()
-       
-        if(isThereAnEndMove == false) {
-            let computerChoice = allValidMoves[Math.floor(Math.random() * allValidMoves.length)];
-            console.log(computerChoice)
-            let coords = this.sinkCoin(computerChoice);
-            row = coords[0];
-            col = coords[1];
-            slotIndex = this.gameBoard[row][col];
-
+     playRound(htmlNode = null) {
+        let player1Result = this.playerMakesMove(htmlNode);
+        console.log(`Player result ${player1Result}`);
+        if(player1Result != null) {
+          this.declareWinner(player1Result);
         } else {
-            row = isThereAnEndMove[0];
-            col = isThereAnEndMove[1];
-            slotIndex = this.gameBoard[row][col];
-            this.updateCoordinates(row, col);
-            console.log(this.availableMoves)
+            this.checkForDraw();
         }
-        
-        slotIndex.htmlElement.classList.add(this.player2.color);
-        this.gameBoard[row][col] = 'Yellow'
-        let winner = this.checkWinner(this.gameBoard);
 
+        let computerResult = this.playerMakesMove();
+        console.log(`compres ${computerResult}`)
+        if(computerResult != null) {
+            this.declareWinner(computerResult);
+        } else {
+            this.checkForDraw();
+        }
+
+      
+        
+    }
+
+    playerMakesMove(htmlNode = null) {
+    let playerResult;
+
+    if(this.currentPlayer == this.player1) {
+       playerResult = this.changeBoard(this.sinkCoin(this.player1.playerMove(htmlNode)));
+       return playerResult
+    } else {
+       playerResult = this.computerMove(); //seems if choice is true it doesnt place it
+       console.log(playerResult)
+       return  playerResult;
+    }
+}
+
+    changeBoard(coord) {
+        if(this.currentPlayer == this.player2) {
+            console.log(coord)
+        }
+        let row  = coord[0];
+        let col = coord[1];
+        
+        
+        this.gameBoard[row][col].htmlElement.classList.add(this.currentPlayer.color);
+        this.gameBoard[row][col] = this.currentPlayer.color
+        
+        
+      
+        let winner = this.checkWinner(this.gameBoard);
+        
         if (winner) {
             return [row, col];
         }
-        
-        this.currentPlayer = this.player1;
+
+        this.currentPlayer = this.currentPlayer.next;
+        this.counter++
         return;
+    }
+  
+
+    computerMove() {
+        
+       
+
+        let arrayOfChoices = [...this.availableMovesForComputer()];
+        let computerDecision = this.computerChoice()
+
+        if (computerDecision == false) {
+            let computerChoice = arrayOfChoices[Math.floor(Math.random() * arrayOfChoices.length)];
+            this.updateCoordinates(computerChoice);
+            let result = this.changeBoard(computerChoice);
+            return result;
+            
+            
+        } else {
+            this.updateCoordinates(computerDecision);
+            let result = this.changeBoard(computerDecision);
+            return result;
+             
+            
+        }
 
     }
-   
+
     availableMovesForComputer() {
         let allValidMoves = [];
         for (let columnIndex = 0; columnIndex < this.availableMoves.length; columnIndex++) {
@@ -170,36 +192,46 @@ class ConnectFour {
             let r = this.availableMoves[columnIndex];
 
             if (r >= 0) {
-                allValidMoves.push(this.gameBoard[r][c]) //this pushes a coordinate of each available move to check.
+                allValidMoves.push([r,c]) //this pushes a coordinate of each available move to check.
             }
         }
-        console.log(allValidMoves)
         return allValidMoves;
     }
 
-    sinkCoin(htmlNode) {
-        let coords = htmlNode.id.split('-'); //'0-0' -> [0,0]
+    computerChoice() {
+        let finalRow;
+        let finalCol;
 
-        let row = parseInt(coords[0]);
-        let col = parseInt(coords[1]);
+        let currentState = this.gameBoard.map(a => Object.assign({}, a))
+        let availableMoves = [...this.availableMovesForComputer()];
 
-        row = this.availableMoves[col]; //Places the coin in the lowest row on that column
-        //This prevents an OOB Exception
-        if (row < 0) {
-            return
+        //This loops through all available moves and blocks red if the move in question would cause red to win.
+        
+        for (let i = 0; i < availableMoves.length; i++) {
+    
+            let row =availableMoves[i][0];
+            let col = availableMoves[i][1];
+            let prevElement = currentState[row][col];
+            
+            currentState[row][col] = 'Red';
+            
+            let winner = this.checkWinner(currentState);
+            if (winner) {
+                finalRow = row;
+                finalCol = col;
+                return [finalRow, finalCol];
+            } else {
+                currentState[row][col] = prevElement;
+            }
         }
 
-        let currentMove = [row, col];
-        this.updateCoordinates(row, col);
-        return currentMove;
+        return false;
+
+
     }
 
-    updateCoordinates(row, col) {
-        row--;
-        this.availableMoves[col] = row;
-    }
 
-    checkWinner(gameArray) { 
+    checkWinner(gameArray) {
 
         //Horizontally right
         for (let r = 0; r < this.rows; r++) {
@@ -259,65 +291,71 @@ class ConnectFour {
             }
         }
 
+
         return false;
     }
 
-    declareWinner(r, c) {
+    declareWinner(coord) {
+        let r = coord[0];
+        let c = coord[1];
+
         let winner = document.getElementById('winner');
         winner.style.color = 'white';
 
         if (this.gameBoard[r][c] == this.player1.color) {
-            winner.textContent = 'The Player Wins!!!';
+            winner.textContent = 'The Player Wins!';
             this.gameOver = true;
-           
+
         }
-        
+
         if (this.gameBoard[r][c] == this.player2.color) {
             winner.textContent = 'The Computer wins!';
             this.gameOver = true;
-           
+
         }
     }
+    
+    checkForDraw() {
+        let winner = document.getElementById('winner');
+        winner.style.color = 'white'
 
-    computerChoice() {
-       // let gameboardArray = [...this.gameBoard]; // this is a hard copied value of the current gameboard array.
-        let currentState = this.gameBoard.map(a => Object.assign({}, a))
-        let availableMoves = [...this.availableMovesForComputer()];
-        let nextPlay = [];
-        
-
-        //get current state of game.
-        //check each available move (loop) and put the player marker in its place.
-            //if this causes the player to win, put the marker in its spot.
-            //else random.
-
-        for(let i = 0; i < availableMoves.length; i++) {
-            let prevElement = availableMoves[i];
-            //console.log(`this is pre move ${prevElement}`);
-            let coords = availableMoves[i].id.split('-');
-            let row = parseInt(coords[0]);
-            let col = parseInt(coords[1]);
-           
-            currentState[row][col] = 'Red';
-            let winner = this.checkWinner(currentState);
-            //console.log(winner)
-            if(winner) {
-                nextPlay.push(row);
-                nextPlay.push(col);
-                return nextPlay;
-            } else {
-                currentState[row][col] = prevElement;
-            }
+        if(this.counter == 42) {
+            winner.textContent = 'The game is a draw!';
+            this.gameOver = true;
         }
-        //console.log(currentState);
-        return false;
-        
+        return
+    }
 
+    sinkCoin(coord) {
+        let row = coord[0];
+        let col = coord[1];
+
+        row = this.availableMoves[col]; //Places the coin in the lowest row on that column
+        //This prevents an OOB Exception
+        if (row < 0) {
+            return
+        }
+
+        let currentMove = [row, col];
+        this.updateCoordinates([row, col]);
+        return currentMove;
+    }
+
+    updateCoordinates(coord) {
+        let row = coord[0];
+        let col = coord[1];
+        row--;
+        this.availableMoves[col] = row;
     }
 }
+
+
+
+
 
 
 window.onload = function () {
     new ConnectFour();
 }
+
 
