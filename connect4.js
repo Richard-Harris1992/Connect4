@@ -11,7 +11,7 @@ add a timeout fxn on player move to slow down the decision making, better UI
 add a check for a win on the minimax function to actively search to win.
 maybe turn this into an actual minimax or at least go another layer deep.
 */
-d
+
 
 
 class Player {
