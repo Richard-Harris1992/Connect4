@@ -5,7 +5,7 @@ Make styling prettier / add more to this
 
 
 
-Try to break all these long pieces of code to smaller functions. / clean this stuff up.
+
 add a timeout fxn on player move to slow down the decision making, better UI
 ****Bonus***
 add a check for a win on the minimax function to actively search to win.
@@ -21,7 +21,7 @@ class Player {
         this.next = null
     }
 
-    playerMove(htmlNode) {
+    getCoords(htmlNode) {
 
         let coords = htmlNode.id.split('-'); //'0-0' -> [0,0]
         let row = parseInt(coords[0]);
@@ -38,12 +38,9 @@ class Player {
         gameBoard[row][col].htmlElement.classList.add(this.color);
         gameBoard[row][col] = this.color
 
-
-
         let winner = this.checkWinner(gameBoard);
-
         if (winner) {
-            return [row, col];
+            return coord;
         }
 
         return;
@@ -71,13 +68,15 @@ class Player {
         let col = coord[1];
         row--;
         availMoves[col] = row;
+
     }
 
     checkWinner(gameArray) {
-
+        let gameRows = 6;
+        let gameColumns = 7
         //Horizontally right
-        for (let r = 0; r < this.rows; r++) {
-            for (let c = 0; c < this.columns - 3; c++) { //-3 is to allow checking 3 ahead without going out of bounds on the array.
+        for (let r = 0; r < gameRows; r++) {
+            for (let c = 0; c < gameColumns - 3; c++) { //-3 is to allow checking 3 ahead without going out of bounds on the array.
                 if (gameArray[r][c] == gameArray[r][c + 1] && gameArray[r][c + 1] == gameArray[r][c + 2] && gameArray[r][c + 2] == gameArray[r][c + 3]) {
                     return true;
                 }
@@ -85,8 +84,8 @@ class Player {
         }
 
         //Horizontally left;
-        for (let r = 0; r < this.rows; r++) {
-            for (let c = 0; c < this.columns - 3; c++) { //-3 is to allow checking 3 ahead without going out of bounds on the array.
+        for (let r = 0; r < gameRows; r++) {
+            for (let c = 0; c < gameColumns - 3; c++) { //-3 is to allow checking 3 ahead without going out of bounds on the array.
                 if (gameArray[r][c] == gameArray[r][c - 1] && gameArray[r][c - 1] == gameArray[r][c - 2] && gameArray[r][c - 2] == gameArray[r][c - 3]) {
                     return true;
                 }
@@ -94,19 +93,21 @@ class Player {
         }
 
         // Vertically
-        for (let r = 0; r < this.rows - 3; r++) {
-            for (let c = 0; c < this.columns; c++) {
+        for (let r = 0; r < gameRows - 3; r++) {
+            for (let c = 0; c < gameColumns; c++) {
+
                 if (gameArray[r][c] == gameArray[r + 1][c] && gameArray[r + 1][c] == gameArray[r + 2][c] && gameArray[r + 2][c] == gameArray[r + 3][c]) {
                     return true;
                 }
+
             }
         }
 
         //Diagonally-Left
 
 
-        for (let r = 0; r < this.rows - 3; r++) {
-            for (let c = 0; c < this.columns - 3; c++) {
+        for (let r = 0; r < gameRows - 3; r++) {
+            for (let c = 0; c < gameColumns - 3; c++) {
                 if (gameArray[r][c] == gameArray[r + 1][c + 1] && gameArray[r + 1][c + 1] == gameArray[r + 2][c + 2] && gameArray[r + 2][c + 2] == gameArray[r + 3][c + 3]) {
                     return true;
                 }
@@ -115,8 +116,8 @@ class Player {
 
         //Diagonaally-Right
 
-        for (let r = 3; r < this.rows; r++) {
-            for (let c = 0; c < this.columns - 3; c++) {
+        for (let r = 3; r < gameRows; r++) {
+            for (let c = 0; c < gameColumns - 3; c++) {
                 if (gameArray[r][c] == gameArray[r - 1][c + 1] && gameArray[r - 1][c + 1] == gameArray[r - 2][c + 2] && gameArray[r - 2][c + 2] == gameArray[r - 3][c + 3]) {
                     return true;
                 }
@@ -127,11 +128,16 @@ class Player {
         return false;
     }
 
-    playerMakesMove(htmlNode = null, gameBoard, availMoves) {
-        let playerResult;
-        let coords = this.playerMove(htmlNode);
+    playerDecision(htmlNode, gameBoard, availMoves) {
 
+        // let playerResult = coords or null
+        //getcoords gets coords from click event and returns row and col
+        let playerResult;
+        let coords = this.getCoords(htmlNode);
+        //sinkcoin =sets coord updates avail row and return coords
         playerResult = this.applyToBoard(this.sinkCoin(coords, availMoves), gameBoard);
+
+        //applytoboard applies changes to board and gameboard array, if there is a winner, return true. if true return coords else null
         return playerResult
     }
 }
@@ -144,43 +150,47 @@ class Computer extends Player {
         this.next = null
     }
 
-    computerMove() {
-
-        let arrayOfChoices = [...this.availableMovesForComputer()];
-        let computerDecision = this.computerAutoPlay()
-
-        if (computerDecision == false) {
-            let computerChoice = arrayOfChoices[Math.floor(Math.random() * arrayOfChoices.length)];
-            this.updateAvailableCoordinates(computerChoice);
-            let result = this.applyToBoard(computerChoice);
-            return result;
-
-
-        } else {
-            this.updateAvailableCoordinates(computerDecision);
-            let result = this.applyToBoard(computerDecision);
-            return result;
+    playerDecision(gameBoard, availMoves) {
+        let result;
+        let arrayOfChoices = [...this.availableMovesForComputer(availMoves)];
+       
+        
+        let aWin = this.computerCheck(gameBoard, arrayOfChoices, 'Yellow');
+        if(aWin != undefined) {
+            result = aWin;
         }
+
+        let aLoss = this.computerCheck(gameBoard, arrayOfChoices, 'Red');
+        if(aLoss != undefined) {
+            result = aLoss;
+        }
+      
+        if(aWin == undefined && aLoss == undefined) {
+            result = arrayOfChoices[Math.floor(Math.random() * arrayOfChoices.length)];
+        }
+
+        this.updateAvailableCoordinates(result, availMoves);
+        result = this.applyToBoard(result, gameBoard);
+        return result;
     }
 
-    computerAutoPlay() {
+    computerCheck(gameBoard, arrayOfChoices, color) {
         let finalRow;
         let finalCol;
 
-        let currentState = this.gameBoard.map(a => Object.assign({}, a))
-        let availableMoves = [...this.availableMovesForComputer()];
+        let currentState = gameBoard.map(a => Object.assign({}, a))
+        //This loops through all available moves and blocks red if the move in question would cause a loss;
 
-        //This loops through all available moves and blocks red if the move in question would cause red to win.
+        for (let i = 0; i < arrayOfChoices.length; i++) {
 
-        for (let i = 0; i < availableMoves.length; i++) {
-
-            let row = availableMoves[i][0];
-            let col = availableMoves[i][1];
+            let row = arrayOfChoices[i][0];
+            let col = arrayOfChoices[i][1];
             let prevElement = currentState[row][col];
 
-            currentState[row][col] = 'Red';
+            currentState[row][col] = color;
 
-            let winner = this.checkWinner(currentState);
+            let winner = this.checkWinner(currentState); //need to move into player class
+
             if (winner) {
                 finalRow = row;
                 finalCol = col;
@@ -189,23 +199,21 @@ class Computer extends Player {
                 currentState[row][col] = prevElement;
             }
         }
-
-        return false;
-
-
     }
 
-    availableMovesForComputer() {
+    availableMovesForComputer(availMoves) {
+
         let allValidMoves = [];
-        for (let columnIndex = 0; columnIndex < this.availableMoves.length; columnIndex++) {
+        for (let columnIndex = 0; columnIndex < availMoves.length; columnIndex++) {
 
             let c = columnIndex;
-            let r = this.availableMoves[columnIndex];
+            let r = availMoves[columnIndex];
 
             if (r >= 0) {
                 allValidMoves.push([r, c])
             }
         }
+
         return allValidMoves;
     }
 
@@ -234,8 +242,6 @@ class ConnectFour {
         this.gameBoardBuilder = this.createBoard();
         this.counter = 0;
     }
-
-    //I might move gameOver / put set winner inside of player class check winner fxn
 
     createBoard() {
         this.player1.next = this.player2; //node structure to get next player.
@@ -280,31 +286,26 @@ class ConnectFour {
     }
 
     playRound(htmlNode = null) {
-        let playerResult = this.player1.playerMakesMove(htmlNode, this.gameBoard, this.availableMoves);
-       
+        let playerResult = this.player1.playerDecision(htmlNode, this.gameBoard, this.availableMoves);
+
         if (playerResult != null) {
             this.declareWinner(playerResult);
         } else {
             this.checkForDraw();
-            this.currentPlayer = this.currentPlayer.next; 
+            this.currentPlayer = this.currentPlayer.next;
             this.counter++
         }
-     
 
-        let computerResult = this.playerMakesMove();
+        let computerResult = this.player2.playerDecision(this.gameBoard, this.availableMoves);
 
         if (computerResult != null) {
             this.declareWinner(computerResult);
         } else {
             this.checkForDraw();
-            this.currentPlayer = this.currentPlayer.next; 
+            this.currentPlayer = this.currentPlayer.next;
             this.counter++
         }
-
-
-
     }
-
 
     declareWinner(coord) {
         let r = coord[0];
@@ -360,9 +361,6 @@ exitBtn.addEventListener('click', function (e) {
     let hideMode = document.getElementById('playAgainModal');
     hideMode.classList = 'hide';
 });
-
-
-
 
 
 window.onload = function () {
