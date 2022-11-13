@@ -1,16 +1,8 @@
 
 /*
 ****************** Checklist**************
-Make styling prettier / add more to this
-    -drop winner display further down
-    -change font-size/ color / font
 
 
-****CURRENT BUGS ********
-Why is computer winning without winning. --seems to be working correctly, maybe I missed the win.
-
-
-add a timeout fxn on player move to slow down the decision making, better UI <- only returns 1 something to do with "this".
 ****Bonus***
 add a check for a win on the minimax function to actively search to win.
 maybe turn this into an actual minimax or at least go another layer deep.
@@ -78,7 +70,7 @@ class Player {
     }
 
     checkWinner(gameArray) {
-    
+
         //Horizontally right
         for (let r = 0; r < this.rows; r++) {
             for (let c = 0; c < this.cols - 3; c++) { //-3 is to allow checking 3 ahead without going out of bounds on the array.
@@ -158,22 +150,20 @@ class Computer extends Player {
     playerDecision(gameBoard, availMoves) {
         let result;
         let arrayOfChoices = [...this.availableMovesForComputer(availMoves)];
-       
-        
+
         let aWin = this.computerCheck(gameBoard, arrayOfChoices, 'Yellow');
-        if(aWin != undefined) {
+        if (aWin != undefined) {
             result = aWin;
+        } else {
+            let aLoss = this.computerCheck(gameBoard, arrayOfChoices, 'Red');
+            if (aLoss != undefined) {
+                result = aLoss;
+            } else {
+                result = arrayOfChoices[Math.floor(Math.random() * arrayOfChoices.length)];   
+            }
+
         }
 
-        let aLoss = this.computerCheck(gameBoard, arrayOfChoices, 'Red');
-        if(aLoss != undefined) {
-            result = aLoss;
-        }
-      
-        if(aWin == undefined && aLoss == undefined) {
-            result = arrayOfChoices[Math.floor(Math.random() * arrayOfChoices.length)];
-        }
-        console.log(result)
         this.updateAvailableCoordinates(result, availMoves);
         result = this.applyToBoard(result, gameBoard);
         return result;
@@ -221,9 +211,6 @@ class Computer extends Player {
 
         return allValidMoves;
     }
-
-
-
 }
 
 class Coin {
@@ -301,24 +288,24 @@ class ConnectFour {
             this.checkForDraw();
             this.currentPlayer = this.currentPlayer.next;
         }
+        
+        setTimeout(() => {
+            let computerResult = this.player2.playerDecision(this.gameBoard, this.availableMoves);
 
-        let computerResult = this.player2.playerDecision(this.gameBoard, this.availableMoves);
-
-        if (computerResult != null) {
-            this.declareWinner(computerResult);
-            return
-        } else {
-            this.counter++
-            this.checkForDraw();
-            this.currentPlayer = this.currentPlayer.next;
-        }
+            if (computerResult != null) {
+                this.declareWinner(computerResult);
+                return
+            } else {
+                this.counter++
+                this.checkForDraw();
+                this.currentPlayer = this.currentPlayer.next;
+            }
+        }, 350);
     }
 
     declareWinner(coord) {
         let r = coord[0];
         let c = coord[1];
-        console.log([r, c])
-        console.log(this.gameBoard[r][c])
         let winner = document.getElementById('winner');
         winner.style.color = 'white';
 
