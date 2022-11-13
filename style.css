@@ -10,24 +10,28 @@ body {
 }
 
 #board {
+    display: flex;
+    flex-wrap: wrap;
+
     height: 540px;
     width: 630px;
     
-    background-color: rgb(60, 60, 194);
     border: 10px solid navy;
     margin: -2% auto;
-    display: flex;
-    flex-wrap: wrap;
+    
+    background-color: rgb(60, 60, 194);
 }
 
 .coin { 
     height: 70px;
     width: 70px;
+    
     margin: 5px;
-
-    background-color: rgb(216, 211, 211);
     border-radius: 50%;
     border: 5px solid navy;
+
+    background-color: rgb(216, 211, 211);
+    
     
 }
 
@@ -43,16 +47,15 @@ body {
     display: none;
 }
 
-
-
 #playAgainModal > button {
-    
-    text-align: center;
-    margin-right:100px ;
-    margin-top: 10%;
     height: 60px;
     width: 300px;
+    
+    margin-right: 100px ;
+    margin-top: 10%;
     border-radius: 1em;
+
+    text-align: center;
     font-family: 'Bungee Shade';
     font-size: 20px;
     font-weight: 700;
@@ -64,10 +67,10 @@ body {
 
 #winner {
     margin-top: 20%;
+
     text-align: center;
     font-size: 50px;
     font-family: 'Bungee Shade';
-
 }
 
 h1 {
@@ -84,5 +87,4 @@ h1 {
     z-index: 10;
     background-color: black;
     opacity: .9;
-    
 }
