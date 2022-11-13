@@ -1,15 +1,3 @@
-
-/*
-****************** Checklist**************
-
-
-****Bonus***
-add a check for a win on the minimax function to actively search to win.
-maybe turn this into an actual minimax or at least go another layer deep.
-*/
-
-
-
 class Player {
     constructor(rows, cols) {
         this.name = 'Player';
@@ -20,7 +8,6 @@ class Player {
     }
 
     getCoords(htmlNode) {
-
         let coords = htmlNode.id.split('-'); //'0-0' -> [0,0]
         let row = parseInt(coords[0]);
         let col = parseInt(coords[1]);
@@ -28,7 +15,6 @@ class Player {
     }
 
     applyToBoard(coord, gameBoard) {
-
         let row = coord[0];
         let col = coord[1];
 
@@ -66,11 +52,9 @@ class Player {
         let col = coord[1];
         row--;
         availMoves[col] = row;
-
     }
 
     checkWinner(gameArray) {
-
         //Horizontally right
         for (let r = 0; r < this.rows; r++) {
             for (let c = 0; c < this.cols - 3; c++) { //-3 is to allow checking 3 ahead without going out of bounds on the array.
@@ -101,8 +85,6 @@ class Player {
         }
 
         //Diagonally-Left
-
-
         for (let r = 0; r < this.rows - 3; r++) {
             for (let c = 0; c < this.cols - 3; c++) {
                 if (gameArray[r][c] == gameArray[r + 1][c + 1] && gameArray[r + 1][c + 1] == gameArray[r + 2][c + 2] && gameArray[r + 2][c + 2] == gameArray[r + 3][c + 3]) {
@@ -112,7 +94,6 @@ class Player {
         }
 
         //Diagonaally-Right
-
         for (let r = 3; r < this.rows; r++) {
             for (let c = 0; c < this.cols - 3; c++) {
                 if (gameArray[r][c] == gameArray[r - 1][c + 1] && gameArray[r - 1][c + 1] == gameArray[r - 2][c + 2] && gameArray[r - 2][c + 2] == gameArray[r - 3][c + 3]) {
@@ -121,20 +102,14 @@ class Player {
             }
         }
 
-
         return false;
     }
 
     playerDecision(htmlNode, gameBoard, availMoves) {
-
-        // let playerResult = coords or null
-        //getcoords gets coords from click event and returns row and col
         let playerResult;
         let coords = this.getCoords(htmlNode);
-        //sinkcoin =sets coord updates avail row and return coords
+        
         playerResult = this.applyToBoard(this.sinkCoin(coords, availMoves), gameBoard);
-
-        //applytoboard applies changes to board and gameboard array, if there is a winner, return true. if true return coords else null
         return playerResult
     }
 }
@@ -144,7 +119,6 @@ class Computer extends Player {
         super(rows, cols);
         this.name = 'Computer';
         this.color = 'Yellow';
-        this.next = null;
     }
 
     playerDecision(gameBoard, availMoves) {
@@ -161,7 +135,6 @@ class Computer extends Player {
             } else {
                 result = arrayOfChoices[Math.floor(Math.random() * arrayOfChoices.length)];   
             }
-
         }
 
         this.updateAvailableCoordinates(result, availMoves);
@@ -197,7 +170,6 @@ class Computer extends Player {
     }
 
     availableMovesForComputer(availMoves) {
-
         let allValidMoves = [];
         for (let columnIndex = 0; columnIndex < availMoves.length; columnIndex++) {
 
@@ -217,51 +189,49 @@ class Coin {
     constructor(id, htmlElement) {
         this.id = id;
         this.htmlElement = htmlElement;
-
     }
 }
 
 class ConnectFour {
     constructor() {
-        this.rows = 6; // y-axis
-        this.columns = 7; //x axis
+        this.rows = 6; 
+        this.columns = 7; 
         this.player1 = new Player(this.rows, this.columns);
         this.player2 = new Computer(this.rows, this.columns);
         this.currentPlayer = this.player1;
-        this.availableMoves = [5, 5, 5, 5, 5, 5, 5]; //this array keeps the coins from floating, they will fall into the bottom most row.
+        //this array keeps the coins from floating, they will fall into the bottom most row.
+        this.availableMoves = [5, 5, 5, 5, 5, 5, 5]; 
         this.gameOver = false;
         this.gameBoard = []
         this.gameBoardBuilder = this.createBoard();
-        this.counter = 0;
+        this.coinCount = 0;
     }
 
     createBoard() {
-        this.player1.next = this.player2; //node structure to get next player.
+        //node structure to get next player.
+        this.player1.next = this.player2; 
         this.player2.next = this.player1;
 
-
+        //this creates the gameboard structure on the DOM and inside this program.
         for (let row = 0; row < this.rows; row++) {
             let rows = [];
             for (let col = 0; col < this.columns; col++) {
-                //HTML
                 let coin = document.createElement('div');
                 coin.id = `${row}-${col}`;
                 coin.classList.add('coin');
-                let tileObj = new Coin(coin.id, coin);
+                let coinObj = new Coin(coin.id, coin);
 
                 document.getElementById('board').appendChild(coin);
-                rows.push(tileObj);
+                rows.push(coinObj);
             }
             this.gameBoard.push(rows);
         }
 
         //after creating all coin slots, this loops through the gameboard array and attaches event listeners to the slots.
         this.clickEvent();
-
     }
 
     clickEvent() {
-
         let flattenedGameboardArray = this.gameBoard.flat()
         flattenedGameboardArray.forEach(coin => {
 
@@ -272,19 +242,18 @@ class ConnectFour {
                 } else {
                     this.playRound(htmlNode);
                 }
-            }); //end eventListener function
+            }); 
         });
-
     }
 
-    playRound(htmlNode = null) {
+    playRound(htmlNode) {
         let playerResult = this.player1.playerDecision(htmlNode, this.gameBoard, this.availableMoves);
 
         if (playerResult != null) {
             this.declareWinner(playerResult);
             return
         } else {
-            this.counter++
+            this.coinCount++
             this.checkForDraw();
             this.currentPlayer = this.currentPlayer.next;
         }
@@ -296,7 +265,7 @@ class ConnectFour {
                 this.declareWinner(computerResult);
                 return
             } else {
-                this.counter++
+                this.coinCount++
                 this.checkForDraw();
                 this.currentPlayer = this.currentPlayer.next;
             }
@@ -314,7 +283,6 @@ class ConnectFour {
             winner.style.color = 'red';
             this.gameOver = true;
             this.turnOnModal()
-
         }
 
         if (this.gameBoard[r][c] == this.player2.color) {
@@ -322,7 +290,6 @@ class ConnectFour {
             winner.style.color = 'yellow';
             this.gameOver = true;
             this.turnOnModal()
-
         }
     }
 
@@ -330,7 +297,7 @@ class ConnectFour {
         let winner = document.getElementById('winner');
         winner.style.color = 'white'
 
-        if (this.counter == 42) {
+        if (this.coinCount == 42) {
             winner.textContent = 'The game is a draw!';
             this.gameOver = true;
             this.turnOnModal()
@@ -341,7 +308,6 @@ class ConnectFour {
         let modal = document.getElementById('playAgainModal');
         modal.classList = 'show';
     }
-
 }
 
 let playAgainBtn = document.querySelector('.yes');
@@ -351,14 +317,11 @@ playAgainBtn.addEventListener('click', function (e) {
     hideModal.classList = 'hide';
 });
 
-
-
 let exitBtn = document.querySelector('.no');
 exitBtn.addEventListener('click', function (e) {
     let hideMode = document.getElementById('playAgainModal');
     hideMode.classList = 'hide';
 });
-
 
 window.onload = function () {
     let game = new ConnectFour;
