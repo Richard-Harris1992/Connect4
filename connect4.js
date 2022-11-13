@@ -2,11 +2,15 @@
 /*
 ****************** Checklist**************
 Make styling prettier / add more to this
+    -drop winner display further down
+    -change font-size/ color / font
 
 
+****CURRENT BUGS ********
+Why is computer winning without winning. --seems to be working correctly, maybe I missed the win.
 
 
-add a timeout fxn on player move to slow down the decision making, better UI
+add a timeout fxn on player move to slow down the decision making, better UI <- only returns 1 something to do with "this".
 ****Bonus***
 add a check for a win on the minimax function to actively search to win.
 maybe turn this into an actual minimax or at least go another layer deep.
@@ -15,10 +19,12 @@ maybe turn this into an actual minimax or at least go another layer deep.
 
 
 class Player {
-    constructor() {
+    constructor(rows, cols) {
         this.name = 'Player';
         this.color = 'Red';
         this.next = null
+        this.rows = rows;
+        this.cols = cols;
     }
 
     getCoords(htmlNode) {
@@ -72,11 +78,10 @@ class Player {
     }
 
     checkWinner(gameArray) {
-        let gameRows = 6;
-        let gameColumns = 7
+    
         //Horizontally right
-        for (let r = 0; r < gameRows; r++) {
-            for (let c = 0; c < gameColumns - 3; c++) { //-3 is to allow checking 3 ahead without going out of bounds on the array.
+        for (let r = 0; r < this.rows; r++) {
+            for (let c = 0; c < this.cols - 3; c++) { //-3 is to allow checking 3 ahead without going out of bounds on the array.
                 if (gameArray[r][c] == gameArray[r][c + 1] && gameArray[r][c + 1] == gameArray[r][c + 2] && gameArray[r][c + 2] == gameArray[r][c + 3]) {
                     return true;
                 }
@@ -84,8 +89,8 @@ class Player {
         }
 
         //Horizontally left;
-        for (let r = 0; r < gameRows; r++) {
-            for (let c = 0; c < gameColumns - 3; c++) { //-3 is to allow checking 3 ahead without going out of bounds on the array.
+        for (let r = 0; r < this.rows; r++) {
+            for (let c = 0; c < this.cols - 3; c++) { //-3 is to allow checking 3 ahead without going out of bounds on the array.
                 if (gameArray[r][c] == gameArray[r][c - 1] && gameArray[r][c - 1] == gameArray[r][c - 2] && gameArray[r][c - 2] == gameArray[r][c - 3]) {
                     return true;
                 }
@@ -93,8 +98,8 @@ class Player {
         }
 
         // Vertically
-        for (let r = 0; r < gameRows - 3; r++) {
-            for (let c = 0; c < gameColumns; c++) {
+        for (let r = 0; r < this.rows - 3; r++) {
+            for (let c = 0; c < this.cols; c++) {
 
                 if (gameArray[r][c] == gameArray[r + 1][c] && gameArray[r + 1][c] == gameArray[r + 2][c] && gameArray[r + 2][c] == gameArray[r + 3][c]) {
                     return true;
@@ -106,8 +111,8 @@ class Player {
         //Diagonally-Left
 
 
-        for (let r = 0; r < gameRows - 3; r++) {
-            for (let c = 0; c < gameColumns - 3; c++) {
+        for (let r = 0; r < this.rows - 3; r++) {
+            for (let c = 0; c < this.cols - 3; c++) {
                 if (gameArray[r][c] == gameArray[r + 1][c + 1] && gameArray[r + 1][c + 1] == gameArray[r + 2][c + 2] && gameArray[r + 2][c + 2] == gameArray[r + 3][c + 3]) {
                     return true;
                 }
@@ -116,8 +121,8 @@ class Player {
 
         //Diagonaally-Right
 
-        for (let r = 3; r < gameRows; r++) {
-            for (let c = 0; c < gameColumns - 3; c++) {
+        for (let r = 3; r < this.rows; r++) {
+            for (let c = 0; c < this.cols - 3; c++) {
                 if (gameArray[r][c] == gameArray[r - 1][c + 1] && gameArray[r - 1][c + 1] == gameArray[r - 2][c + 2] && gameArray[r - 2][c + 2] == gameArray[r - 3][c + 3]) {
                     return true;
                 }
@@ -143,11 +148,11 @@ class Player {
 }
 
 class Computer extends Player {
-    constructor() {
-        super();
+    constructor(rows, cols) {
+        super(rows, cols);
         this.name = 'Computer';
         this.color = 'Yellow';
-        this.next = null
+        this.next = null;
     }
 
     playerDecision(gameBoard, availMoves) {
@@ -168,7 +173,7 @@ class Computer extends Player {
         if(aWin == undefined && aLoss == undefined) {
             result = arrayOfChoices[Math.floor(Math.random() * arrayOfChoices.length)];
         }
-
+        console.log(result)
         this.updateAvailableCoordinates(result, availMoves);
         result = this.applyToBoard(result, gameBoard);
         return result;
@@ -231,11 +236,11 @@ class Coin {
 
 class ConnectFour {
     constructor() {
-        this.player1 = new Player();
-        this.player2 = new Computer();
-        this.currentPlayer = this.player1;
         this.rows = 6; // y-axis
         this.columns = 7; //x axis
+        this.player1 = new Player(this.rows, this.columns);
+        this.player2 = new Computer(this.rows, this.columns);
+        this.currentPlayer = this.player1;
         this.availableMoves = [5, 5, 5, 5, 5, 5, 5]; //this array keeps the coins from floating, they will fall into the bottom most row.
         this.gameOver = false;
         this.gameBoard = []
@@ -290,32 +295,36 @@ class ConnectFour {
 
         if (playerResult != null) {
             this.declareWinner(playerResult);
+            return
         } else {
+            this.counter++
             this.checkForDraw();
             this.currentPlayer = this.currentPlayer.next;
-            this.counter++
         }
 
         let computerResult = this.player2.playerDecision(this.gameBoard, this.availableMoves);
 
         if (computerResult != null) {
             this.declareWinner(computerResult);
+            return
         } else {
+            this.counter++
             this.checkForDraw();
             this.currentPlayer = this.currentPlayer.next;
-            this.counter++
         }
     }
 
     declareWinner(coord) {
         let r = coord[0];
         let c = coord[1];
-
+        console.log([r, c])
+        console.log(this.gameBoard[r][c])
         let winner = document.getElementById('winner');
         winner.style.color = 'white';
 
         if (this.gameBoard[r][c] == this.player1.color) {
             winner.textContent = 'The Player Wins!';
+            winner.style.color = 'red';
             this.gameOver = true;
             this.turnOnModal()
 
@@ -323,6 +332,7 @@ class ConnectFour {
 
         if (this.gameBoard[r][c] == this.player2.color) {
             winner.textContent = 'The Computer wins!';
+            winner.style.color = 'yellow';
             this.gameOver = true;
             this.turnOnModal()
 

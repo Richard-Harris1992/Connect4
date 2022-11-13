@@ -20,7 +20,7 @@ body {
     flex-wrap: wrap;
 }
 
-.coin {
+.coin { 
     height: 70px;
     width: 70px;
     margin: 5px;
@@ -48,20 +48,25 @@ body {
 #playAgainModal > button {
     
     text-align: center;
-    margin:100px ;
-    margin-top: 20%;
+    margin-right:100px ;
+    margin-top: 10%;
     height: 60px;
     width: 300px;
     border-radius: 1em;
-    padding: 20px;
+    font-family: 'Bungee Shade';
     font-size: 20px;
     font-weight: 700;
 }
 
+#playAgainModal > button:hover {
+    background:linear-gradient(0.25turn, red, white, yellow);
+}
+
 #winner {
-    margin-top: 5%;
+    margin-top: 20%;
     text-align: center;
     font-size: 50px;
+    font-family: 'Bungee Shade';
 
 }
 
