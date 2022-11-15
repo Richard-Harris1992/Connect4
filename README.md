@@ -27,13 +27,13 @@ Project is a static HTML/CSS/JS web site and is hosted directly from the GitHub 
 
 2. Gameplay
 ![End state](./images/gameplay.png)
-    -Starting with the user, they will drop their first coin.
-    -The computer will then play.
-    -There are 3 End states:
-        -Win State
-        -Lose State
-        -Draw State
-    -Once one of the above conditions is met, the user will have the option of starting a new game or to just take a look at the end state of the board.
+    - Starting with the user, they will drop their first coin.
+    - The computer will then play.
+    - There are 3 End states:
+        - Win State
+        - Lose State
+        - Draw State
+    - Once one of the above conditions is met, the user will have the option of starting a new game or to just take a look at the end state of the board.
 
     ##Future developments
     I would like to one day implement a minimax algorithm with alpha-beta pruning.
