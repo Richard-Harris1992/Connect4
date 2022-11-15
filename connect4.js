@@ -164,6 +164,12 @@ class Computer extends Player {
                 finalCol = col;
                 return [finalRow, finalCol];
             } else {
+                //update coords on the array
+                //run checkwinner fxn,
+                //return value
+                //un-update coords on array
+                //return to prev element
+                //recursion
                 currentState[row][col] = prevElement;
             }
         }
@@ -327,5 +333,3 @@ window.onload = function () {
     let game = new ConnectFour;
 
 }
-
-
