@@ -26,7 +26,7 @@ Project is a static HTML/CSS/JS web site and is hosted directly from the GitHub 
 1. Two players (User vs PC)
 
 2. Gameplay
-[!End state](./images/gameplay.png)
+![End state](./images/gameplay.png)
     -Starting with the user, they will drop their first coin.
     -The computer will then play.
     -There are 3 End states:
