@@ -4,7 +4,7 @@ This was a project idea to make a favorite childhood game.
 
 ![Connect 4 board](./images/connect4.png)
 
-[!Live site](https://richard-harris1992.github.io/Connect4/)
+[-Live site](https://richard-harris1992.github.io/Connect4/)
 
 ## Build Status
 
