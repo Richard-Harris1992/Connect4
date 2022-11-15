@@ -46,7 +46,7 @@ Project is a static HTML/CSS/JS web site and is hosted directly from the GitHub 
     1. It will see if on its current turn, if it can win.
         - It does this by storing a cloned copy of the current game state, it then chooses each individual slot that is valid to choose and then checks if there is a winner.
         - If its a win, it will return the coordinates then place a coin in that location.
-    2. If the above condition is false, it will do the inverse of the first and check for a loss.
+    2. If the above condition is false, it will do the inverse of the first and check for a loss, then select that spot to try to block the user.
     3. if both conditions are false, it will randomly select a valid slot and place its coin there.
 - The program will check on the completion of each players turn if there is a win/loss/draw state and either declare the winner, or update gameboard and the valid spots, then continues the game.
 
