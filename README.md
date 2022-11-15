@@ -2,6 +2,8 @@
 
 This was a project idea to make a favorite childhood game. 
 
+![Connect 4 board](./images/connect4.png)
+
 ## Build Status
 
 Project is a static HTML/CSS/JS web site and is hosted directly from the GitHub respository via GitHub Pages
@@ -36,4 +38,5 @@ Project is a static HTML/CSS/JS web site and is hosted directly from the GitHub 
     - Once one of the above conditions is met, the user will have the option of starting a new game or to just take a look at the end state of the board.
 
     ##Future developments
+
     I would like to one day implement a minimax algorithm with alpha-beta pruning.
