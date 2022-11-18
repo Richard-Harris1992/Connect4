@@ -66,7 +66,7 @@ class Player {
 
         //Horizontally left;
         for (let r = 0; r < this.rows; r++) {
-            for (let c = 0; c < this.cols - 3; c++) { //-3 is to allow checking 3 ahead without going out of bounds on the array.
+            for (let c = 0; c < this.cols - 3; c++) { 
                 if (gameArray[r][c] == gameArray[r][c - 1] && gameArray[r][c - 1] == gameArray[r][c - 2] && gameArray[r][c - 2] == gameArray[r][c - 3]) {
                     return true;
                 }
@@ -157,19 +157,13 @@ class Computer extends Player {
 
             currentState[row][col] = color;
 
-            let winner = this.checkWinner(currentState); //need to move into player class
+            let winner = this.checkWinner(currentState); 
 
             if (winner) {
                 finalRow = row;
                 finalCol = col;
                 return [finalRow, finalCol];
             } else {
-                //update coords on the array
-                //run checkwinner fxn,
-                //return value
-                //un-update coords on array
-                //return to prev element
-                //recursion
                 currentState[row][col] = prevElement;
             }
         }
@@ -331,5 +325,4 @@ exitBtn.addEventListener('click', function (e) {
 
 window.onload = function () {
     let game = new ConnectFour;
-
 }
