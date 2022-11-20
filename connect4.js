@@ -125,11 +125,11 @@ class Computer extends Player {
         let result;
         let arrayOfChoices = [...this.availableMovesForComputer(availMoves)];
 
-        let aWin = this.computerCheck(gameBoard, arrayOfChoices, 'Yellow');
+        let aWin = this.computerCheck(gameBoard, arrayOfChoices, this.color);
         if (aWin != undefined) {
             result = aWin;
         } else {
-            let aLoss = this.computerCheck(gameBoard, arrayOfChoices, 'Red');
+            let aLoss = this.computerCheck(gameBoard, arrayOfChoices, this.next.color);
             if (aLoss != undefined) {
                 result = aLoss;
             } else {
@@ -325,4 +325,5 @@ exitBtn.addEventListener('click', function (e) {
 
 window.onload = function () {
     let game = new ConnectFour;
+
 }
