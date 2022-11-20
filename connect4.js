@@ -66,7 +66,7 @@ class Player {
 
         //Horizontally left;
         for (let r = 0; r < this.rows; r++) {
-            for (let c = 0; c < this.cols - 3; c++) { 
+            for (let c = 0; c < this.cols - 3; c++) {
                 if (gameArray[r][c] == gameArray[r][c - 1] && gameArray[r][c - 1] == gameArray[r][c - 2] && gameArray[r][c - 2] == gameArray[r][c - 3]) {
                     return true;
                 }
@@ -108,7 +108,7 @@ class Player {
     playerDecision(htmlNode, gameBoard, availMoves) {
         let playerResult;
         let coords = this.getCoords(htmlNode);
-        
+
         playerResult = this.applyToBoard(this.sinkCoin(coords, availMoves), gameBoard);
         return playerResult
     }
@@ -133,7 +133,7 @@ class Computer extends Player {
             if (aLoss != undefined) {
                 result = aLoss;
             } else {
-                result = arrayOfChoices[Math.floor(Math.random() * arrayOfChoices.length)];   
+                result = arrayOfChoices[Math.floor(Math.random() * arrayOfChoices.length)];
             }
         }
 
@@ -157,7 +157,7 @@ class Computer extends Player {
 
             currentState[row][col] = color;
 
-            let winner = this.checkWinner(currentState); 
+            let winner = this.checkWinner(currentState);
 
             if (winner) {
                 finalRow = row;
@@ -194,13 +194,13 @@ class Coin {
 
 class ConnectFour {
     constructor() {
-        this.rows = 6; 
-        this.columns = 7; 
+        this.rows = 6;
+        this.columns = 7;
         this.player1 = new Player(this.rows, this.columns);
         this.player2 = new Computer(this.rows, this.columns);
         this.currentPlayer = this.player1;
         //this array keeps the coins from floating, they will fall into the bottom most row.
-        this.availableMoves = [5, 5, 5, 5, 5, 5, 5]; 
+        this.availableMoves = [5, 5, 5, 5, 5, 5, 5];
         this.gameOver = false;
         this.gameBoard = []
         this.gameBoardBuilder = this.createBoard();
@@ -209,8 +209,22 @@ class ConnectFour {
 
     createBoard() {
         //node structure to get next player.
-        this.player1.next = this.player2; 
+        this.player1.next = this.player2;
         this.player2.next = this.player1;
+
+        //adding click event listeners for the endgame modal
+        let playAgainBtn = document.querySelector('.yes');
+        playAgainBtn.addEventListener('click', function (e) {
+            let hideModal = document.getElementById('playAgainModal');
+            window.location.reload(false);
+            hideModal.classList = 'hide';
+        });
+
+        let exitBtn = document.querySelector('.no');
+        exitBtn.addEventListener('click', function (e) {
+            let hideMode = document.getElementById('playAgainModal');
+            hideMode.classList = 'hide';
+        });
 
         //this creates the gameboard structure on the DOM and inside this program.
         for (let row = 0; row < this.rows; row++) {
@@ -242,7 +256,7 @@ class ConnectFour {
                 } else {
                     this.playRound(htmlNode);
                 }
-            }); 
+            });
         });
     }
 
@@ -257,7 +271,7 @@ class ConnectFour {
             this.checkForDraw();
             this.currentPlayer = this.currentPlayer.next;
         }
-        
+
         setTimeout(() => {
             let computerResult = this.player2.playerDecision(this.gameBoard, this.availableMoves);
 
@@ -310,18 +324,6 @@ class ConnectFour {
     }
 }
 
-let playAgainBtn = document.querySelector('.yes');
-playAgainBtn.addEventListener('click', function (e) {
-    let hideModal = document.getElementById('playAgainModal');
-    window.location.reload(false);
-    hideModal.classList = 'hide';
-});
-
-let exitBtn = document.querySelector('.no');
-exitBtn.addEventListener('click', function (e) {
-    let hideMode = document.getElementById('playAgainModal');
-    hideMode.classList = 'hide';
-});
 
 window.onload = function () {
     let game = new ConnectFour;
