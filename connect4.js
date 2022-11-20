@@ -326,6 +326,6 @@ class ConnectFour {
 
 
 window.onload = function () {
-    let game = new ConnectFour;
+     new ConnectFour();
 
 }
