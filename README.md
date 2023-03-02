@@ -1,5 +1,5 @@
 ## Connect 4
-
+TEST
 This was a project idea to make a favorite childhood game. 
 
 ![Connect 4 board](./images/connect4.png)
